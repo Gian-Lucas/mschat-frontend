@@ -3,7 +3,8 @@ import styles from "./home.module.scss";
 import { io, Socket } from "socket.io-client";
 import { useEffect, useState } from "react";
 
-import { signIn, signOut, useSession } from "next-auth/react";
+import { getSession, signIn, signOut, useSession } from "next-auth/react";
+import { GetServerSideProps } from "next";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -33,17 +34,25 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <h1>Hello World!</h1>
-      {session ? (
-        <>
-          Signed in as {session.user.email} <br />
-          <button onClick={() => signOut()}>Sign out</button>
-        </>
-      ) : (
-        <>
-          Not signed in <br />
-          <button onClick={() => signIn("google")}>Sign in</button>
-        </>
-      )}
+      Signed in as {session.user.email} <br />
+      <button onClick={() => signOut()}>Sign out</button>
     </div>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async ({ req }) => {
+  const session = await getSession({ req });
+
+  if (!session) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+};
