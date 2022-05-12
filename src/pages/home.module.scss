@@ -1,3 +1,129 @@
 .container {
-  text-align: center;
+  padding: 2rem;
+  max-width: 1080px;
+  margin: 0 auto;
+
+  display: grid;
+  grid-template-columns: 1fr 2.5fr;
+  gap: 0;
+
+  .contacts {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+
+    .contact {
+      cursor: pointer;
+      transition: 0.2s;
+      background: var(--gray-light);
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      border-top: 1px solid var(--dark-blue);
+      padding: 0.5rem 0;
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      img {
+        width: 3rem;
+        border-radius: 100%;
+      }
+
+      div {
+        display: flex;
+        flex-direction: column;
+        margin-left: 1rem;
+
+        span {
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    :first-child {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: none;
+    }
+    :last-child {
+      padding-bottom: 0;
+    }
+  }
+
+  .chat {
+    background: var(--gray-light);
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-start;
+    padding: 1rem;
+    flex-direction: column;
+
+    .messages {
+      margin-bottom: 1rem;
+      width: 100%;
+
+      div {
+        display: flex;
+        width: 100%;
+        color: var(--white);
+
+        margin-top: 0.5rem;
+
+        span {
+          max-width: 80%;
+          border-radius: 0.7rem;
+          padding: 0.7rem;
+          background: var(--blue);
+        }
+      }
+
+      .receive {
+        justify-content: flex-start;
+      }
+
+      .sent {
+        justify-content: flex-end;
+      }
+    }
+
+    form {
+      display: flex;
+      width: 100%;
+
+      input {
+        border: none;
+        border-radius: 0.4rem;
+        width: 100%;
+        margin-right: 0.5rem;
+        caret-color: var(--dark-blue);
+        padding: 0.5rem;
+
+        &::placeholder {
+          color: var(--dark-blue);
+        }
+      }
+
+      button {
+        font-weight: 700;
+        transition: 0.2s;
+        cursor: pointer;
+        border: none;
+        border-radius: 0.4rem;
+        padding: 0.5rem;
+        border: 2px solid var(--dark-blue);
+        color: var(--white);
+        background: var(--dark-blue);
+
+        &:hover {
+          color: var(--dark-blue);
+          background: transparent;
+        }
+      }
+    }
+  }
 }

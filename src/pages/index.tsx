@@ -71,27 +71,73 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <h1>Hello World!</h1>
-      Signed in as {session.user.email} <br />
-      <button onClick={() => signOut()}>Sign out</button>
-      <form onSubmit={(e) => sendMessage(e, message)}>
-        <input
-          type="text"
-          required
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button type="submit">Enviar</button>
-      </form>
-      <div className="messages">
-        {messages.map((msg) => {
-          return (
-            <span style={{ display: "block" }}>
-              <strong>{msg.user.name} </strong>
-              {msg.text}
-            </span>
-          );
-        })}
+      <div className={styles.contacts}>
+        <div className={styles.contact}>
+          <img
+            src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
+            alt="Gian"
+          />
+          <div>
+            <strong>Gian Lucas</strong>
+            <span>Lorem ipsum dolor sit amet elit.</span>
+          </div>
+        </div>
+        <div className={styles.contact}>
+          <img
+            src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
+            alt="Gian"
+          />
+          <div>
+            <strong>Gian Lucas</strong>
+            <span>Lorem ipsum dolor sit amet elit.</span>
+          </div>
+        </div>
+        <div className={styles.contact}>
+          <img
+            src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
+            alt="Gian"
+          />
+          <div>
+            <strong>Gian Lucas</strong>
+            <span>Lorem ipsum dolor sit amet elit.</span>
+          </div>
+        </div>
+        <div className={styles.contact}>
+          <img
+            src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
+            alt="Gian"
+          />
+          <div>
+            <strong>Gian Lucas</strong>
+            <span>Lorem ipsum dolor sit amet elit.</span>
+          </div>
+        </div>
+      </div>
+
+      <div className={styles.chat}>
+        <div className={styles.messages}>
+          {messages.map((msg) => {
+            return (
+              <div className={styles.sent}>
+                <span style={{ display: "block" }}>
+                  {/* <strong>{msg.user.name} </strong> */}
+                  {msg.text}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
+        <form onSubmit={(e) => sendMessage(e, message)}>
+          <input
+            type="text"
+            required
+            placeholder="Mensagem..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <button type="submit">Enviar</button>
+        </form>
       </div>
     </div>
   );

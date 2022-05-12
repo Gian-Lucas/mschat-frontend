@@ -1,7 +1,7 @@
 :root {
   --white: #f9f7f7;
-  --gray-light: #dbe2ef;
-  --blue: #3f72af;
+  --gray-light: #d2d7e2;
+  --blue: #1564c4;
   --dark-blue: #112d4e;
 }
 
@@ -12,6 +12,12 @@
 }
 
 body {
-  background: #eee;
+  background: var(--white);
+  color: var(--dark-blue);
+  font-family: "Roboto", sans-serif;
+}
+
+input,
+button {
   font-family: "Roboto", sans-serif;
 }
