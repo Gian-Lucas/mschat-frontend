@@ -3,9 +3,14 @@ import styles from "./home.module.scss";
 import { io, Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 
-import { getSession, useSession } from "next-auth/react";
+import CopyToClipboard from "react-copy-to-clipboard";
+import { MdOutlineContentCopy } from "react-icons/md";
+
+import { getSession, signOut, useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { FormEvent } from "react";
+import { generateId } from "../utils/generateId";
+import { api } from "../services/api";
 
 interface Message {
   user: {
@@ -16,10 +21,18 @@ interface Message {
   text: string;
 }
 
+interface Room {
+  id: string;
+  title: string;
+  code: string;
+}
+
 export default function Home() {
   const { data: session, status } = useSession();
   const [socket, setSocket] = useState<Socket>(null);
   const [message, setMessage] = useState("");
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [currentRoom, setCurrentRoom] = useState(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
   const messagesEndRef = useRef(null);
@@ -34,6 +47,18 @@ export default function Home() {
   }, [messages]);
 
   useEffect(() => {
+    (async () => {
+      if (session) {
+        const result = await api.post("/rooms", {
+          email: session.user.email,
+        });
+        const roomsData = !result.data.error ? result.data.rooms : [];
+        setRooms(roomsData);
+      }
+    })();
+  }, [session]);
+
+  useEffect(() => {
     const newSocket = io("http://localhost:8080");
     setSocket(newSocket);
 
@@ -43,24 +68,28 @@ export default function Home() {
   }, [setSocket]);
 
   if (status === "loading") {
+    console.log("check status");
     return <span>Fazendo login...</span>;
   }
 
   if (socket) {
-    socket.on("receive_message", (msg: Message) => {
-      console.log(`${msg.user.name}: ${msg.text}`);
-      setMessages([
-        ...messages,
-        {
-          user: {
-            name: msg.user.name,
-            email: msg.user.email,
-            image: msg.user.image,
+    if (message === "") {
+      console.log("salve");
+      socket.on("receive_message", (msg: Message) => {
+        console.log(`${msg.user.name}: ${msg.text}`);
+        setMessages([
+          ...messages,
+          {
+            user: {
+              name: msg.user.name,
+              email: msg.user.email,
+              image: msg.user.image,
+            },
+            text: msg.text,
           },
-          text: msg.text,
-        },
-      ]);
-    });
+        ]);
+      });
+    }
   }
 
   function sendMessage(e: FormEvent<HTMLFormElement>, text: string) {
@@ -74,102 +103,123 @@ export default function Home() {
     setMessage("");
   }
 
+  async function handleCreateRoom() {
+    const room = prompt("Nome da sala");
+
+    const result = await api.post("/create/room", {
+      room,
+      email: session.user.email,
+    });
+
+    alert(result.data.message);
+
+    if (result.data.error) {
+      return;
+    }
+
+    console.log(result.data.room);
+    setRooms([...rooms, result.data.room]);
+
+    setCurrentRoom(result.data.room.title);
+  }
+
+  function handleEnterInRoom() {
+    const roomCode = prompt("Código da sala");
+
+    console.log(roomCode);
+  }
+
   return (
-    <div className={styles.container}>
-      <div className={styles.info}>
-        <div className={styles.logo}>
-          <h1>MSchat</h1>
-        </div>
-        <div className={styles.profile}>
-          <img
-            src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
-            alt="Gian"
-          />
+    <>
+      <div className={styles.container}>
+        <div className={styles.info}>
+          <div className={styles.logo}>
+            <h1>MSchat</h1>
+          </div>
+          {currentRoom && (
+            <div className={styles.profile}>
+              <img src={session.user.image} alt={session.user.name} />
 
-          <strong>Gian Lucas</strong>
-        </div>
-      </div>
-
-      <hr />
-
-      <div className={styles.contactsAndChat}>
-        <div className={styles.contacts}>
-          <div className={styles.contact}>
-            <img
-              src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
-              alt="Gian"
-            />
-            <div>
-              <strong>Gian Lucas</strong>
-              <span>Lorem ipsum dolor sit amet elit.</span>
+              <strong>{currentRoom}</strong>
             </div>
-          </div>
-          <div className={styles.contact}>
-            <img
-              src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
-              alt="Gian"
-            />
-            <div>
-              <strong>Gian Lucas</strong>
-              <span>Lorem ipsum dolor sit amet elit.</span>
-            </div>
-          </div>
-          <div className={styles.contact}>
-            <img
-              src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
-              alt="Gian"
-            />
-            <div>
-              <strong>Gian Lucas</strong>
-              <span>Lorem ipsum dolor sit amet elit.</span>
-            </div>
-          </div>
-          <div className={styles.contact}>
-            <img
-              src="https://lh3.googleusercontent.com/a-/AOh14GiitBijx-Lv6w9hwV8en8koNBGvwhHK6cmCQfTdJg=s96-c"
-              alt="Gian"
-            />
-            <div>
-              <strong>Gian Lucas</strong>
-              <span>Lorem ipsum dolor sit amet elit.</span>
-            </div>
-          </div>
+          )}
         </div>
 
-        <div className={styles.chat}>
-          <div id="messages" className={styles.messages}>
-            {messages.map((msg) => {
+        <div className={styles.roomsAndChat}>
+          <div className={styles.rooms}>
+            {rooms.map((room) => {
               return (
                 <div
-                  className={
-                    msg.user.email === session.user.email
-                      ? styles.sent
-                      : styles.receive
-                  }
+                  className={styles.room}
+                  key={room.id}
+                  onClick={() => setCurrentRoom(room.title)}
                 >
-                  <span style={{ display: "block" }}>
-                    {/* <strong>{msg.user.name} </strong> */}
-                    {msg.text}
-                  </span>
+                  <img src={session.user.image} alt={room.title} />
+                  <div>
+                    <strong>{room.title}</strong>
+                    <span>
+                      Código: {room.code} &nbsp;
+                      <CopyToClipboard
+                        text={room.code}
+                        onCopy={() => {
+                          alert("Copiado!");
+                        }}
+                      >
+                        <MdOutlineContentCopy className={styles.iconCopy} />
+                      </CopyToClipboard>
+                    </span>
+                  </div>
                 </div>
               );
             })}
-            <div ref={messagesEndRef} />
           </div>
 
-          <form onSubmit={(e) => sendMessage(e, message)}>
-            <input
-              type="text"
-              required
-              placeholder="Mensagem..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <button type="submit">Enviar</button>
-          </form>
+          {currentRoom ? (
+            <div className={styles.chat}>
+              <div id="messages" className={styles.messages}>
+                {messages.map((msg) => {
+                  return (
+                    <div
+                      key={generateId()}
+                      className={
+                        msg.user.email === session.user.email
+                          ? styles.sent
+                          : styles.receive
+                      }
+                    >
+                      <span style={{ display: "block" }}>
+                        {/* <strong>{msg.user.name} </strong> */}
+                        {msg.text}
+                      </span>
+                    </div>
+                  );
+                })}
+                <div ref={messagesEndRef} />
+              </div>
+
+              <form onSubmit={(e) => sendMessage(e, message)}>
+                <input
+                  type="text"
+                  required
+                  placeholder="Mensagem..."
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                />
+                <button type="submit">Enviar</button>
+              </form>
+            </div>
+          ) : (
+            <div className={styles.containerButtonNewRoom}>
+              <h1>Suas mensagens</h1>
+              <button onClick={handleCreateRoom}>Criar nova sala</button>
+              <button onClick={handleEnterInRoom}>Entrar em uma sala</button>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+      <button onClick={() => signOut()}>Sair</button>
+      <button onClick={handleCreateRoom}>Criar nova sala</button>
+    </>
   );
 }
 

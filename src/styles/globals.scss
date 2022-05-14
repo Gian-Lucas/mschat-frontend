@@ -1,6 +1,7 @@
 :root {
   --white: #f9f7f7;
   --gray-light: #d2d7e2;
+  --gray-light-2: #cacfd8;
   --blue: #1564c4;
   --gray-blue: #506f92;
   --dark-blue: #112d4e;
@@ -25,4 +26,20 @@ body {
 input,
 button {
   font-family: "Roboto", sans-serif;
+}
+
+button {
+  cursor: pointer;
+  transition: 0.2s;
+  border: none;
+  border-radius: 0.4rem;
+  border: 2px solid var(--dark-blue);
+  color: var(--white);
+  background: var(--dark-blue);
+  font-weight: 700;
+
+  &:hover {
+    color: var(--dark-blue);
+    background: transparent;
+  }
 }

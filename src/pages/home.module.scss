@@ -6,40 +6,38 @@
   display: flex;
   flex-direction: column;
 
-  hr {
-    border-top: 1px solid var(--white);
-  }
-
   .info {
     display: grid;
     grid-template-columns: 1fr 2.5fr;
-
     background: var(--gray-light);
 
     .logo {
+      padding: 1rem;
       align-self: center;
-      margin-left: 0.8rem;
     }
     .profile {
-      margin: 0.5rem 0 0.5rem 0.5rem;
+      padding: 0.7rem;
       display: flex;
       align-items: center;
 
       img {
         width: 3rem;
         border-radius: 100%;
+        margin-right: 0.5rem;
       }
     }
   }
 
-  .contactsAndChat {
+  .roomsAndChat {
     grid-template-columns: 1fr 2.5fr;
     display: grid;
 
-    .contacts {
+    border-top: 2px solid var(--white);
+
+    .rooms {
       display: flex;
       justify-content: flex-start;
-      align-items: center;
+      align-items: flex-start;
       align-self: flex-start;
       flex-direction: column;
 
@@ -50,19 +48,20 @@
 
       border-right: 2px solid var(--white);
 
-      .contact {
+      .room {
+        width: 100%;
         cursor: pointer;
         transition: 0.2s;
 
         display: flex;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
 
         border-top: 2px solid var(--white);
         padding: 0.5rem;
 
         &:hover {
-          opacity: 0.8;
+          background: var(--gray-light-2);
         }
 
         img {
@@ -76,7 +75,19 @@
           margin-left: 1rem;
 
           span {
+            margin-top: 0.2rem;
             font-size: 0.9rem;
+
+            display: flex;
+            align-items: center;
+
+            .iconCopy {
+              transition: 0.2s;
+            }
+
+            .iconCopy:hover {
+              color: var(--blue);
+            }
           }
         }
       }
@@ -147,21 +158,23 @@
         }
 
         button {
-          font-weight: 700;
-          transition: 0.2s;
-          cursor: pointer;
-          border: none;
-          border-radius: 0.4rem;
           padding: 0.5rem;
-          border: 2px solid var(--dark-blue);
-          color: var(--white);
-          background: var(--dark-blue);
-
-          &:hover {
-            color: var(--dark-blue);
-            background: transparent;
-          }
         }
+      }
+    }
+
+    .containerButtonNewRoom {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+
+      background: var(--gray-light);
+
+      button {
+        margin-top: 1rem;
+        font-size: 1rem;
+        padding: 0.7rem;
       }
     }
   }
