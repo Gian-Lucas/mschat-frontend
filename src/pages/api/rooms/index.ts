@@ -1,16 +1,11 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { User } from "../../schemas/user";
-import { connectMongo } from "../../services/connectMongo";
+import { Room } from "../../../schemas/room";
+import { connectMongo } from "../../../services/connectMongo";
 
-interface IUser {
-  name: string;
-  email: string;
-  image: string;
-  rooms: Array<{
-    id: string;
-    title: string;
-    code: string;
-  }>;
+interface IRoom {
+  id: string;
+  title: string;
+  code: string;
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -19,9 +14,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const { email } = req.body;
       await connectMongo();
 
-      const user = await User.findOne<IUser>({ email });
+      const rooms = await Room.find<IRoom>({ userEmail: email });
 
-      return res.json({ error: false, rooms: user.rooms });
+      return res.json({ error: false, rooms });
     } catch (error) {
       console.log(error);
       return res.json({ error: true, message: "get rooms failed" });

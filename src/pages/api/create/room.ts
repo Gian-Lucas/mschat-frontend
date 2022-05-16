@@ -1,17 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { User } from "../../../schemas/user";
+import { Room } from "../../../schemas/room";
 import { connectMongo } from "../../../services/connectMongo";
 import { generateId } from "../../../utils/generateId";
 
-interface IUser {
-  name: string;
-  email: string;
-  image: string;
-  rooms: Array<{
-    id: string;
-    title: string;
-    code: string;
-  }>;
+interface IRoom {
+  id: string;
+  title: string;
+  code: string;
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -20,33 +15,23 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const { room, email } = req.body;
       await connectMongo();
 
-      const user = await User.findOne<IUser>({ email });
+      const roomInDB = await Room.findOne<IRoom>({ title: room });
 
-      const roomAlreadyExists = user.rooms.find(
-        (userRoom) => userRoom.title === room
-      );
-
-      if (roomAlreadyExists) {
+      if (roomInDB) {
         return res.json({
           error: true,
           message: "Já existe uma sala com esse nome!",
         });
       }
 
-      const newRoom = {
+      const newRoom = new Room({
         id: generateId(),
         title: room,
         code: generateId(),
-      };
+        userEmail: email,
+      });
 
-      const addRoom = await User.findOneAndUpdate(
-        { email },
-        {
-          rooms: [...user.rooms, newRoom],
-        }
-      );
-
-      console.log(addRoom);
+      await newRoom.save();
 
       return res.json({
         error: false,

@@ -25,6 +25,28 @@
         border-radius: 100%;
         margin-right: 0.5rem;
       }
+
+      div {
+        display: flex;
+        flex-direction: column;
+        margin-left: 1rem;
+
+        span {
+          margin-top: 0.2rem;
+          font-size: 0.9rem;
+
+          display: flex;
+          align-items: center;
+
+          .iconCopy {
+            transition: 0.2s;
+          }
+
+          .iconCopy:hover {
+            color: var(--blue);
+          }
+        }
+      }
     }
   }
 
@@ -67,28 +89,7 @@
         img {
           width: 3rem;
           border-radius: 100%;
-        }
-
-        div {
-          display: flex;
-          flex-direction: column;
-          margin-left: 1rem;
-
-          span {
-            margin-top: 0.2rem;
-            font-size: 0.9rem;
-
-            display: flex;
-            align-items: center;
-
-            .iconCopy {
-              transition: 0.2s;
-            }
-
-            .iconCopy:hover {
-              color: var(--blue);
-            }
-          }
+          margin-right: 1rem;
         }
       }
 

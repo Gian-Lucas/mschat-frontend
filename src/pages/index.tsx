@@ -31,8 +31,10 @@ export default function Home() {
   const { data: session, status } = useSession();
   const [socket, setSocket] = useState<Socket>(null);
   const [message, setMessage] = useState("");
+  const [loadingRooms, setLoadingRooms] = useState(true);
+  const [userInRoomsAsGuest, setUserInRoomsAsGuest] = useState(false);
   const [rooms, setRooms] = useState<Room[]>([]);
-  const [currentRoom, setCurrentRoom] = useState(null);
+  const [currentRoom, setCurrentRoom] = useState<Room>(null);
   const [messages, setMessages] = useState<Message[]>([]);
 
   const messagesEndRef = useRef(null);
@@ -49,11 +51,14 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       if (session) {
-        const result = await api.post("/rooms", {
-          email: session.user.email,
-        });
-        const roomsData = !result.data.error ? result.data.rooms : [];
-        setRooms(roomsData);
+        if (!userInRoomsAsGuest) {
+          const result = await api.post("/rooms", {
+            email: session.user.email,
+          });
+          const roomsData = !result.data.error ? result.data.rooms : [];
+          setRooms(roomsData);
+          setLoadingRooms(false);
+        }
       }
     })();
   }, [session]);
@@ -98,9 +103,14 @@ export default function Home() {
     socket.emit("send_message", {
       user: session.user,
       text,
+      roomCode: currentRoom.code,
     });
 
     setMessage("");
+  }
+
+  function joinInRoom(code: string) {
+    socket.emit("join_room", code);
   }
 
   async function handleCreateRoom() {
@@ -120,13 +130,50 @@ export default function Home() {
     console.log(result.data.room);
     setRooms([...rooms, result.data.room]);
 
-    setCurrentRoom(result.data.room.title);
+    handleSetCurrentRoom(result.data.room);
   }
 
-  function handleEnterInRoom() {
+  function handleSetCurrentRoom(room: Room) {
+    setCurrentRoom(room);
+    joinInRoom(room.code);
+    setMessages([]);
+  }
+
+  async function handleEnterInRoom() {
     const roomCode = prompt("Código da sala");
 
-    console.log(roomCode);
+    if (currentRoom) {
+      if (roomCode === currentRoom.code) {
+        alert("Você já está na sala!");
+        return;
+      }
+    }
+
+    const roomExistsInUserRooms = rooms.find((room) => room.code === roomCode);
+
+    if (roomExistsInUserRooms) {
+      handleSetCurrentRoom(roomExistsInUserRooms);
+      return;
+    }
+
+    const { data } = await api.get("/rooms/all");
+
+    if (data.error) {
+      alert("Falha ao entrar na sala!");
+      return;
+    }
+
+    const roomExists = data.rooms.find((room: Room) => room.code === roomCode);
+
+    if (!roomExists) {
+      alert("Essa sala não existe, verifique se o código está correto.");
+      return;
+    }
+
+    setRooms([...rooms, roomExists]);
+    joinInRoom(roomCode);
+    handleSetCurrentRoom(roomExists);
+    setUserInRoomsAsGuest(true);
   }
 
   return (
@@ -140,38 +187,46 @@ export default function Home() {
             <div className={styles.profile}>
               <img src={session.user.image} alt={session.user.name} />
 
-              <strong>{currentRoom}</strong>
+              <div>
+                <strong>{currentRoom.title}</strong>
+                <span>
+                  Código: {currentRoom.code} &nbsp;
+                  <CopyToClipboard
+                    text={currentRoom.code}
+                    onCopy={() => {
+                      alert("Copiado!");
+                    }}
+                  >
+                    <MdOutlineContentCopy className={styles.iconCopy} />
+                  </CopyToClipboard>
+                </span>
+              </div>
             </div>
           )}
         </div>
 
         <div className={styles.roomsAndChat}>
           <div className={styles.rooms}>
-            {rooms.map((room) => {
-              return (
-                <div
-                  className={styles.room}
-                  key={room.id}
-                  onClick={() => setCurrentRoom(room.title)}
-                >
-                  <img src={session.user.image} alt={room.title} />
-                  <div>
-                    <strong>{room.title}</strong>
-                    <span>
-                      Código: {room.code} &nbsp;
-                      <CopyToClipboard
-                        text={room.code}
-                        onCopy={() => {
-                          alert("Copiado!");
-                        }}
-                      >
-                        <MdOutlineContentCopy className={styles.iconCopy} />
-                      </CopyToClipboard>
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
+            {loadingRooms ? (
+              <span>Carregando salas...</span>
+            ) : (
+              <>
+                {rooms.map((room) => {
+                  return (
+                    <div
+                      className={styles.room}
+                      key={room.id}
+                      onClick={() => handleSetCurrentRoom(room)}
+                    >
+                      <img src={session.user.image} alt={room.title} />
+                      <div>
+                        <strong>{room.title}</strong>
+                      </div>
+                    </div>
+                  );
+                })}
+              </>
+            )}
           </div>
 
           {currentRoom ? (
@@ -188,7 +243,11 @@ export default function Home() {
                       }
                     >
                       <span style={{ display: "block" }}>
-                        {/* <strong>{msg.user.name} </strong> */}
+                        <strong>
+                          {msg.user.email === session.user.email
+                            ? ""
+                            : msg.user.name + " "}
+                        </strong>
                         {msg.text}
                       </span>
                     </div>
@@ -218,6 +277,7 @@ export default function Home() {
         </div>
       </div>
       <button onClick={() => signOut()}>Sair</button>
+      <button onClick={handleEnterInRoom}>Entrar em uma sala</button>
       <button onClick={handleCreateRoom}>Criar nova sala</button>
     </>
   );
