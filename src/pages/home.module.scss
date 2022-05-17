@@ -1,5 +1,4 @@
 .container {
-  padding: 1rem;
   max-width: 1080px;
   margin: 0 auto;
 
@@ -11,39 +10,66 @@
     grid-template-columns: 1fr 2.5fr;
     background: var(--gray-light);
 
+    .logout {
+      width: fit-content;
+      height: fit-content;
+      padding: 0.5rem;
+      margin: auto 0.7rem auto auto;
+    }
+
     .logo {
       padding: 1rem;
       align-self: center;
+
+      h1 {
+        cursor: pointer;
+      }
     }
     .profile {
       padding: 0.7rem;
       display: flex;
+      width: 100%;
       align-items: center;
-
+      justify-content: space-between;
       img {
         width: 3rem;
         border-radius: 100%;
         margin-right: 0.5rem;
       }
 
+      .backToHome {
+        transition: 0.2s;
+        font-size: 1.5rem;
+        color: var(--dark-blue);
+        cursor: pointer;
+
+        &:hover {
+          color: var(--blue);
+        }
+      }
       div {
         display: flex;
-        flex-direction: column;
-        margin-left: 1rem;
+        align-items: center;
 
-        span {
-          margin-top: 0.2rem;
-          font-size: 0.9rem;
-
+        div {
           display: flex;
-          align-items: center;
+          flex-direction: column;
+          align-items: flex-start;
 
-          .iconCopy {
-            transition: 0.2s;
-          }
+          span {
+            margin-top: 0.2rem;
+            font-size: 1rem;
 
-          .iconCopy:hover {
-            color: var(--blue);
+            display: flex;
+            align-items: center;
+
+            .iconCopy {
+              transition: 0.2s;
+            }
+
+            .iconCopy:hover {
+              color: var(--blue);
+            }
           }
         }
       }

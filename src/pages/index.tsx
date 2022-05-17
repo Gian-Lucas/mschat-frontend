@@ -5,12 +5,15 @@ import { useEffect, useRef, useState } from "react";
 
 import CopyToClipboard from "react-copy-to-clipboard";
 import { MdOutlineContentCopy } from "react-icons/md";
+import { TiArrowBack } from "react-icons/ti";
 
 import { getSession, signOut, useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { FormEvent } from "react";
 import { generateId } from "../utils/generateId";
 import { api } from "../services/api";
+import { BallTriangle } from "react-loader-spinner";
+import { toast } from "react-toastify";
 
 interface Message {
   user: {
@@ -44,7 +47,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    console.log(messages);
+    // console.log(messages);
     scrollToBottom();
   }, [messages]);
 
@@ -73,15 +76,23 @@ export default function Home() {
   }, [setSocket]);
 
   if (status === "loading") {
-    console.log("check status");
-    return <span>Fazendo login...</span>;
+    // console.log("check status");
+    return (
+      <div className="loading-session">
+        <BallTriangle
+          width="100"
+          color="#112d4e"
+          ariaLabel="loading-session-indicator"
+        />
+      </div>
+    );
   }
 
   if (socket) {
     if (message === "") {
-      console.log("salve");
+      // console.log("salve");
       socket.on("receive_message", (msg: Message) => {
-        console.log(`${msg.user.name}: ${msg.text}`);
+        // console.log(`${msg.user.name}: ${msg.text}`);
         setMessages([
           ...messages,
           {
@@ -116,35 +127,48 @@ export default function Home() {
   async function handleCreateRoom() {
     const room = prompt("Nome da sala");
 
+    if (!room) return;
+
     const result = await api.post("/create/room", {
       room,
       email: session.user.email,
     });
 
-    alert(result.data.message);
-
     if (result.data.error) {
+      toast.error(result.data.message);
       return;
     }
+    toast.success(result.data.message, {
+      autoClose: 1500,
+    });
 
-    console.log(result.data.room);
+    // console.log(result.data.room);
     setRooms([...rooms, result.data.room]);
 
     handleSetCurrentRoom(result.data.room);
   }
 
   function handleSetCurrentRoom(room: Room) {
+    if (room.code === currentRoom?.code) {
+      return;
+    }
+
+    socket.on("room_messages", (messagesRoom: Message[]) => {
+      setMessages(messagesRoom);
+    });
+
     setCurrentRoom(room);
     joinInRoom(room.code);
-    setMessages([]);
   }
 
   async function handleEnterInRoom() {
     const roomCode = prompt("Código da sala");
 
+    if (!roomCode) return;
+
     if (currentRoom) {
       if (roomCode === currentRoom.code) {
-        alert("Você já está na sala!");
+        toast.warn("Você já está na sala!");
         return;
       }
     }
@@ -159,14 +183,14 @@ export default function Home() {
     const { data } = await api.get("/rooms/all");
 
     if (data.error) {
-      alert("Falha ao entrar na sala!");
+      toast.error("Falha ao entrar na sala!");
       return;
     }
 
     const roomExists = data.rooms.find((room: Room) => room.code === roomCode);
 
     if (!roomExists) {
-      alert("Essa sala não existe, verifique se o código está correto.");
+      toast.error("Essa sala não existe, verifique se o código está correto.");
       return;
     }
 
@@ -181,34 +205,60 @@ export default function Home() {
       <div className={styles.container}>
         <div className={styles.info}>
           <div className={styles.logo}>
-            <h1>MSchat</h1>
+            <h1
+              onClick={() => {
+                setCurrentRoom(null);
+              }}
+            >
+              MSchat
+            </h1>
           </div>
+          {!currentRoom && (
+            <button className={styles.logout} onClick={() => signOut()}>
+              Sair
+            </button>
+          )}
           {currentRoom && (
             <div className={styles.profile}>
-              <img src={session.user.image} alt={session.user.name} />
-
               <div>
-                <strong>{currentRoom.title}</strong>
-                <span>
-                  Código: {currentRoom.code} &nbsp;
-                  <CopyToClipboard
-                    text={currentRoom.code}
-                    onCopy={() => {
-                      alert("Copiado!");
-                    }}
-                  >
-                    <MdOutlineContentCopy className={styles.iconCopy} />
-                  </CopyToClipboard>
-                </span>
+                <img src={session.user.image} alt={session.user.name} />
+                <div>
+                  <strong>{currentRoom.title}</strong>
+                  <span>
+                    Código: {currentRoom.code} &nbsp;
+                    <CopyToClipboard
+                      style={{ cursor: "pointer" }}
+                      text={currentRoom.code}
+                      onCopy={() => {
+                        toast.success("Código copiado!", { autoClose: 1500 });
+                      }}
+                    >
+                      <MdOutlineContentCopy className={styles.iconCopy} />
+                    </CopyToClipboard>
+                  </span>
+                </div>
               </div>
+              <TiArrowBack
+                className={styles.backToHome}
+                onClick={() => {
+                  setCurrentRoom(null);
+                }}
+              />
             </div>
           )}
         </div>
 
         <div className={styles.roomsAndChat}>
-          <div className={styles.rooms}>
+          <aside className={styles.rooms}>
             {loadingRooms ? (
-              <span>Carregando salas...</span>
+              <>
+                Carregando salas
+                <BallTriangle
+                  width="50"
+                  color="#112d4e"
+                  ariaLabel="loading-rooms-indicator"
+                />
+              </>
             ) : (
               <>
                 {rooms.map((room) => {
@@ -227,10 +277,10 @@ export default function Home() {
                 })}
               </>
             )}
-          </div>
+          </aside>
 
           {currentRoom ? (
-            <div className={styles.chat}>
+            <main className={styles.chat}>
               <div id="messages" className={styles.messages}>
                 {messages.map((msg) => {
                   return (
@@ -266,7 +316,7 @@ export default function Home() {
                 />
                 <button type="submit">Enviar</button>
               </form>
-            </div>
+            </main>
           ) : (
             <div className={styles.containerButtonNewRoom}>
               <h1>Suas mensagens</h1>
@@ -276,9 +326,6 @@ export default function Home() {
           )}
         </div>
       </div>
-      <button onClick={() => signOut()}>Sair</button>
-      <button onClick={handleEnterInRoom}>Entrar em uma sala</button>
-      <button onClick={handleCreateRoom}>Criar nova sala</button>
     </>
   );
 }
