@@ -67,7 +67,7 @@ export default function Home() {
   }, [session]);
 
   useEffect(() => {
-    const newSocket = io("http://localhost:8080");
+    const newSocket = io(process.env.BACKEND_URL);
     setSocket(newSocket);
 
     return () => {
