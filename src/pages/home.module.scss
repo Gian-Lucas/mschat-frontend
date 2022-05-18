@@ -1,6 +1,6 @@
 .container {
   max-width: 1080px;
-  margin: 0 auto;
+  margin: auto;
 
   display: flex;
   flex-direction: column;
@@ -91,7 +91,7 @@
 
       background: var(--gray-light);
 
-      height: 80vh;
+      height: 89.5vh;
       overflow-y: auto;
 
       border-right: 2px solid var(--white);
@@ -131,7 +131,7 @@
       flex-direction: column;
 
       background: var(--gray-light);
-      height: 80vh;
+      height: 89.5vh;
 
       .messages {
         width: 100%;
