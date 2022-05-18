@@ -68,6 +68,7 @@ export default function Home() {
 
   useEffect(() => {
     const newSocket = io("https://mschat-back.herokuapp.com/");
+    // const newSocket = io("http://localhost:8080/");
     setSocket(newSocket);
 
     return () => {

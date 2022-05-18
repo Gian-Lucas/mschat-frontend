@@ -1,0 +1,13 @@
+.container {
+  height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  button {
+    margin-top: 1rem;
+    font-size: 1rem;
+    padding: 0.7rem;
+  }
+}
