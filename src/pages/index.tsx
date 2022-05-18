@@ -67,7 +67,7 @@ export default function Home() {
   }, [session]);
 
   useEffect(() => {
-    const newSocket = io(process.env.BACKEND_URL);
+    const newSocket = io("https://mschat-back.herokuapp.com/");
     setSocket(newSocket);
 
     return () => {
