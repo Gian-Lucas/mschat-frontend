@@ -223,6 +223,9 @@ export default function Home() {
 
           <Menu>
             <MenuButton
+              _hover={{
+                bg: "gray.700",
+              }}
               autoFocus={false}
               bg="gray.700"
               as={IconButton}
@@ -230,13 +233,30 @@ export default function Home() {
               icon={<MdAdd />}
             />
             <MenuList bg="gray.700">
-              <MenuItem onClick={handleCreateRoom}>
+              <MenuItem
+                _focus={{
+                  bg: "gray.700",
+                }}
+                onClick={handleCreateRoom}
+              >
                 Criar uma nova sala
               </MenuItem>
-              <MenuItem onClick={handleEnterInRoom}>
+              <MenuItem
+                _focus={{
+                  bg: "gray.700",
+                }}
+                onClick={handleEnterInRoom}
+              >
                 Entrar em uma sala
               </MenuItem>
-              <MenuItem onClick={() => signOut()}>Deslogar</MenuItem>
+              <MenuItem
+                _focus={{
+                  bg: "gray.700",
+                }}
+                onClick={() => signOut()}
+              >
+                Deslogar
+              </MenuItem>
             </MenuList>
           </Menu>
         </Flex>
