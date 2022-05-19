@@ -16,10 +16,10 @@ export const theme = extendTheme({
       html: {
         scrollBehavior: "smooth",
       },
-      // body: {
-      //   bg: "gray.800",
-      //   color: "gray.200",
-      // },
+      body: {
+        bg: "gray.800",
+        color: "gray.200",
+      },
     },
   },
 });
