@@ -254,7 +254,7 @@ export default function Home() {
                 </Flex>
               </Flex>
 
-              <Flex flexDir="column" justify="flex-end" w="100%" h="80vh">
+              <Flex flexDir="column" justify="flex-end" w="100%" h="75vh">
                 <Messages
                   messages={messages}
                   messagesEndRef={messagesEndRef}
