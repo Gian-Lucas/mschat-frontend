@@ -223,7 +223,7 @@ export default function Home() {
 
           <Menu>
             <MenuButton
-              _hover={{
+              _focus={{
                 bg: "gray.700",
               }}
               autoFocus={false}
