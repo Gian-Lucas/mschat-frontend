@@ -76,8 +76,8 @@ export default function Home() {
   }, [session]);
 
   useEffect(() => {
-    const newSocket = io("https://mschat-back.herokuapp.com/");
-    // const newSocket = io("http://localhost:8080/");
+    // const newSocket = io("https://mschat-back.herokuapp.com/");
+    const newSocket = io("http://localhost:8080/");
     setSocket(newSocket);
 
     return () => {
@@ -222,8 +222,13 @@ export default function Home() {
           />
 
           <Menu>
-            <MenuButton as={IconButton} aria-label="Menu" icon={<MdAdd />} />
-            <MenuList>
+            <MenuButton
+              bg="gray.700"
+              as={IconButton}
+              aria-label="Menu"
+              icon={<MdAdd />}
+            />
+            <MenuList bg="gray.700">
               <MenuItem onClick={handleCreateRoom}>
                 Criar uma nova sala
               </MenuItem>
@@ -270,7 +275,7 @@ export default function Home() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                     />
-                    <Button fontSize="14" type="submit">
+                    <Button fontSize="14" type="submit" bg="gray.700">
                       Enviar
                     </Button>
                   </Flex>

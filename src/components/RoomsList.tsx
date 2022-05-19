@@ -39,6 +39,7 @@ export function RoomsList({
   return (
     <>
       <IconButton
+        bg="gray.700"
         aria-label="Open rooms list"
         icon={<FiMenu />}
         ref={btnRef}
@@ -52,8 +53,8 @@ export function RoomsList({
         finalFocusRef={btnRef}
       >
         <DrawerOverlay />
-        <DrawerContent>
-          <DrawerCloseButton />
+        <DrawerContent bg="gray.700">
+          <DrawerCloseButton bg="gray.700" />
           <DrawerHeader>Salas</DrawerHeader>
 
           <DrawerBody>
