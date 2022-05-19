@@ -1,13 +1,16 @@
 import { SessionProvider } from "next-auth/react";
 import { AppProps } from "next/app";
 import { ToastContainer } from "react-toastify";
-import "../styles/globals.scss";
 import "react-toastify/dist/ReactToastify.css";
+import { ChakraProvider } from "@chakra-ui/react";
+import { theme } from "../styles/theme";
 
 function MyApp({ Component, pageProps: { session, pageProps } }: AppProps) {
   return (
     <SessionProvider session={session}>
-      <Component {...pageProps} />
+      <ChakraProvider theme={theme}>
+        <Component {...pageProps} />
+      </ChakraProvider>
       <ToastContainer
         position="top-right"
         theme="dark"

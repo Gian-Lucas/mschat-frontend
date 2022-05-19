@@ -1,14 +1,15 @@
+import { Button, Flex, Heading } from "@chakra-ui/react";
 import { GetServerSideProps } from "next";
 import { getSession, signIn } from "next-auth/react";
 
-import styles from "./login.module.scss";
-
 export default function Login() {
   return (
-    <div className={styles.container}>
-      <h1>Fazer login</h1>
-      <button onClick={() => signIn("google")}>Sign in</button>
-    </div>
+    <Flex justify="center" align="center" flexDir="column" h="90vh">
+      <Heading>Fazer login</Heading>
+      <Button onClick={() => signIn("google")} mt="6">
+        Sign in
+      </Button>
+    </Flex>
   );
 }
 

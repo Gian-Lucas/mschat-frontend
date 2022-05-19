@@ -1,19 +1,28 @@
-import styles from "./home.module.scss";
-
 import { io, Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 
 import CopyToClipboard from "react-copy-to-clipboard";
-import { MdOutlineContentCopy } from "react-icons/md";
-import { TiArrowBack } from "react-icons/ti";
+import { MdAdd, MdOutlineContentCopy } from "react-icons/md";
 
 import { getSession, signOut, useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { FormEvent } from "react";
-import { generateId } from "../utils/generateId";
 import { api } from "../services/api";
-import { BallTriangle } from "react-loader-spinner";
 import { toast } from "react-toastify";
+import {
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Input,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuList,
+  Spinner,
+} from "@chakra-ui/react";
+import { RoomsList } from "../components/RoomsList";
+import { Messages } from "../components/Messages";
 
 interface Message {
   user: {
@@ -79,13 +88,9 @@ export default function Home() {
   if (status === "loading") {
     // console.log("check status");
     return (
-      <div className="loading-session">
-        <BallTriangle
-          width="100"
-          color="#112d4e"
-          ariaLabel="loading-session-indicator"
-        />
-      </div>
+      <Flex h="90vh" justify="center" align="center">
+        <Spinner />
+      </Flex>
     );
   }
 
@@ -111,6 +116,11 @@ export default function Home() {
 
   function sendMessage(e: FormEvent<HTMLFormElement>, text: string) {
     e.preventDefault();
+
+    if (text === "") {
+      console.log("pode n");
+      return;
+    }
 
     socket.emit("send_message", {
       user: session.user,
@@ -203,9 +213,79 @@ export default function Home() {
 
   return (
     <>
-      <div className={styles.container}>
-        <div className={styles.info}>
-          <div className={styles.logo}>
+      <Flex flexDir="column" p="2">
+        <Flex justify="space-between">
+          <RoomsList
+            rooms={rooms}
+            handleSetCurrentRoom={handleSetCurrentRoom}
+            loadingRooms={loadingRooms}
+          />
+
+          <Menu>
+            <MenuButton as={IconButton} aria-label="Menu" icon={<MdAdd />} />
+            <MenuList>
+              <MenuItem onClick={handleCreateRoom}>
+                Criar uma nova sala
+              </MenuItem>
+              <MenuItem onClick={handleEnterInRoom}>
+                Entrar em uma sala
+              </MenuItem>
+              <MenuItem onClick={() => signOut()}>Deslogar</MenuItem>
+            </MenuList>
+          </Menu>
+        </Flex>
+
+        <Flex justify="center" align="center" mt="4">
+          {currentRoom ? (
+            <Flex flexDir="column" align="center" p="1" w="100%">
+              <Flex align="center" justify="space-between" w="100%">
+                <Heading>{currentRoom.title}</Heading>
+                <Flex align="center" fontSize="14">
+                  {currentRoom.code} &nbsp;
+                  <CopyToClipboard
+                    style={{ cursor: "pointer" }}
+                    text={currentRoom.code}
+                    onCopy={() => {
+                      toast.success("Código copiado!", { autoClose: 1500 });
+                    }}
+                  >
+                    <MdOutlineContentCopy />
+                  </CopyToClipboard>
+                </Flex>
+              </Flex>
+
+              <Flex flexDir="column" justify="flex-end" w="100%" h="80vh">
+                <Messages
+                  messages={messages}
+                  messagesEndRef={messagesEndRef}
+                  email={session.user.email}
+                />
+
+                <form onSubmit={(e) => sendMessage(e, message)}>
+                  <Flex>
+                    <Input
+                      fontSize="14"
+                      placeholder="Mensagem..."
+                      mr="2"
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                    />
+                    <Button fontSize="14" type="submit">
+                      Enviar
+                    </Button>
+                  </Flex>
+                </form>
+              </Flex>
+            </Flex>
+          ) : (
+            <Heading mt="10">MSchat</Heading>
+          )}
+        </Flex>
+      </Flex>
+
+      {/* <div>
+        <div>
+          <div>
             <h1
               onClick={() => {
                 setCurrentRoom(null);
@@ -214,13 +294,9 @@ export default function Home() {
               MSchat
             </h1>
           </div>
-          {!currentRoom && (
-            <button className={styles.logout} onClick={() => signOut()}>
-              Sair
-            </button>
-          )}
+          {!currentRoom && <button onClick={() => signOut()}>Sair</button>}
           {currentRoom && (
-            <div className={styles.profile}>
+            <div>
               <div>
                 <img src={session.user.image} alt={session.user.name} />
                 <div>
@@ -234,13 +310,12 @@ export default function Home() {
                         toast.success("Código copiado!", { autoClose: 1500 });
                       }}
                     >
-                      <MdOutlineContentCopy className={styles.iconCopy} />
+                      <MdOutlineContentCopy />
                     </CopyToClipboard>
                   </span>
                 </div>
               </div>
               <TiArrowBack
-                className={styles.backToHome}
                 onClick={() => {
                   setCurrentRoom(null);
                 }}
@@ -249,8 +324,8 @@ export default function Home() {
           )}
         </div>
 
-        <div className={styles.roomsAndChat}>
-          <aside className={styles.rooms}>
+        <div>
+          <aside>
             {loadingRooms ? (
               <>
                 Carregando salas
@@ -265,7 +340,6 @@ export default function Home() {
                 {rooms.map((room) => {
                   return (
                     <div
-                      className={styles.room}
                       key={room.id}
                       onClick={() => handleSetCurrentRoom(room)}
                     >
@@ -281,18 +355,11 @@ export default function Home() {
           </aside>
 
           {currentRoom ? (
-            <main className={styles.chat}>
-              <div id="messages" className={styles.messages}>
+            <main>
+              <div id="messages">
                 {messages.map((msg) => {
                   return (
-                    <div
-                      key={generateId()}
-                      className={
-                        msg.user.email === session.user.email
-                          ? styles.sent
-                          : styles.receive
-                      }
-                    >
+                    <div key={generateId()}>
                       <span style={{ display: "block" }}>
                         <strong>
                           {msg.user.email === session.user.email
@@ -319,14 +386,14 @@ export default function Home() {
               </form>
             </main>
           ) : (
-            <div className={styles.containerButtonNewRoom}>
+            <div>
               <h1>Suas mensagens</h1>
               <button onClick={handleCreateRoom}>Criar nova sala</button>
               <button onClick={handleEnterInRoom}>Entrar em uma sala</button>
             </div>
           )}
         </div>
-      </div>
+      </div> */}
     </>
   );
 }

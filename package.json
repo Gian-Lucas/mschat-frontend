@@ -9,7 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.0.2",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
     "axios": "^0.27.2",
+    "framer-motion": "^6",
     "mongoose": "^6.3.3",
     "next": "12.1.6",
     "next-auth": "^4.3.4",
@@ -17,9 +21,7 @@
     "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "18.1.0",
     "react-icons": "^4.3.1",
-    "react-loader-spinner": "^6.0.0-0",
     "react-toastify": "^9.0.1",
-    "sass": "^1.51.0",
     "socket.io-client": "^4.5.0"
   },
   "devDependencies": {
