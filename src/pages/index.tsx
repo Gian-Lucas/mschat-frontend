@@ -240,7 +240,7 @@ export default function Home() {
             <Flex flexDir="column" align="center" p="1" w="100%">
               <Flex align="center" justify="space-between" w="100%">
                 <Heading>{currentRoom.title}</Heading>
-                <Flex align="center" fontSize="14">
+                <Flex align="center" fontSize="16">
                   {currentRoom.code} &nbsp;
                   <CopyToClipboard
                     style={{ cursor: "pointer" }}
