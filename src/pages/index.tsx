@@ -223,6 +223,7 @@ export default function Home() {
 
           <Menu>
             <MenuButton
+              autoFocus={false}
               bg="gray.700"
               as={IconButton}
               aria-label="Menu"
@@ -275,7 +276,14 @@ export default function Home() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                     />
-                    <Button fontSize="14" type="submit" bg="gray.700">
+                    <Button
+                      fontSize="14"
+                      type="submit"
+                      bg="gray.700"
+                      _hover={{
+                        bg: "gray.700",
+                      }}
+                    >
                       Enviar
                     </Button>
                   </Flex>
