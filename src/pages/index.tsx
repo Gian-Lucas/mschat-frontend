@@ -76,8 +76,8 @@ export default function Home() {
   }, [session]);
 
   useEffect(() => {
-    // const newSocket = io("https://mschat-back.herokuapp.com/");
-    const newSocket = io("http://localhost:8080/");
+    const newSocket = io("https://mschat-back.herokuapp.com/");
+    // const newSocket = io("http://localhost:8080/");
     setSocket(newSocket);
 
     return () => {
