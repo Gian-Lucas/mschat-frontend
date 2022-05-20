@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import {
   Button,
   Flex,
+  Grid,
   Heading,
   IconButton,
   Input,
@@ -20,6 +21,7 @@ import {
   MenuItem,
   MenuList,
   Spinner,
+  useBreakpointValue,
 } from "@chakra-ui/react";
 import { RoomsList } from "../components/RoomsList";
 import { Messages } from "../components/Messages";
@@ -40,6 +42,8 @@ interface Room {
 }
 
 export default function Home() {
+  const isDesktop = useBreakpointValue({ md: true });
+
   const { data: session, status } = useSession();
   const [socket, setSocket] = useState<Socket>(null);
   const [message, setMessage] = useState("");
@@ -76,8 +80,11 @@ export default function Home() {
   }, [session]);
 
   useEffect(() => {
-    const newSocket = io("https://mschat-back.herokuapp.com/");
-    // const newSocket = io("http://localhost:8080/");
+    const url =
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:8080/"
+        : "https://mschat-back.herokuapp.com/";
+    const newSocket = io(url);
     setSocket(newSocket);
 
     return () => {
@@ -212,56 +219,67 @@ export default function Home() {
   }
 
   return (
-    <>
-      <Flex flexDir="column" p="2">
-        <Flex justify="space-between">
+    <Flex flexDir="column" p="2" maxW="1080" mx="auto">
+      <Flex justify="space-between">
+        {!isDesktop ? (
           <RoomsList
             rooms={rooms}
             handleSetCurrentRoom={handleSetCurrentRoom}
             loadingRooms={loadingRooms}
           />
-
-          <Menu>
-            <MenuButton
+        ) : (
+          <Heading>MSchat</Heading>
+        )}
+        <Menu>
+          <MenuButton
+            _focus={{
+              bg: "gray.700",
+            }}
+            autoFocus={false}
+            bg="gray.700"
+            as={IconButton}
+            aria-label="Menu"
+            icon={<MdAdd />}
+          />
+          <MenuList bg="gray.700">
+            <MenuItem
               _focus={{
                 bg: "gray.700",
               }}
-              autoFocus={false}
-              bg="gray.700"
-              as={IconButton}
-              aria-label="Menu"
-              icon={<MdAdd />}
-            />
-            <MenuList bg="gray.700">
-              <MenuItem
-                _focus={{
-                  bg: "gray.700",
-                }}
-                onClick={handleCreateRoom}
-              >
-                Criar uma nova sala
-              </MenuItem>
-              <MenuItem
-                _focus={{
-                  bg: "gray.700",
-                }}
-                onClick={handleEnterInRoom}
-              >
-                Entrar em uma sala
-              </MenuItem>
-              <MenuItem
-                _focus={{
-                  bg: "gray.700",
-                }}
-                onClick={() => signOut()}
-              >
-                Deslogar
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
+              onClick={handleCreateRoom}
+            >
+              Criar uma nova sala
+            </MenuItem>
+            <MenuItem
+              _focus={{
+                bg: "gray.700",
+              }}
+              onClick={handleEnterInRoom}
+            >
+              Entrar em uma sala
+            </MenuItem>
+            <MenuItem
+              _focus={{
+                bg: "gray.700",
+              }}
+              onClick={() => signOut()}
+            >
+              Deslogar
+            </MenuItem>
+          </MenuList>
+        </Menu>
+      </Flex>
 
-        <Flex justify="center" align="center" mt="4">
+      <Grid mt="5" templateColumns={isDesktop ? "1fr 3fr" : "1fr"}>
+        {isDesktop && (
+          <RoomsList
+            rooms={rooms}
+            handleSetCurrentRoom={handleSetCurrentRoom}
+            loadingRooms={loadingRooms}
+          />
+        )}
+
+        <Flex flex="1" justify="center" align="center">
           {currentRoom ? (
             <Flex flexDir="column" align="center" p="1" w="100%">
               <Flex align="center" justify="space-between" w="100%">
@@ -311,123 +329,19 @@ export default function Home() {
               </Flex>
             </Flex>
           ) : (
-            <Heading mt="10">MSchat</Heading>
+            <Flex align="center" flexDir="column" mt="20">
+              <Heading>MSchat</Heading>
+              <Button mt="8" onClick={handleCreateRoom}>
+                Criar uma nova sala
+              </Button>
+              <Button mt="5" onClick={handleEnterInRoom}>
+                Entrar em uma sala
+              </Button>
+            </Flex>
           )}
         </Flex>
-      </Flex>
-
-      {/* <div>
-        <div>
-          <div>
-            <h1
-              onClick={() => {
-                setCurrentRoom(null);
-              }}
-            >
-              MSchat
-            </h1>
-          </div>
-          {!currentRoom && <button onClick={() => signOut()}>Sair</button>}
-          {currentRoom && (
-            <div>
-              <div>
-                <img src={session.user.image} alt={session.user.name} />
-                <div>
-                  <strong>{currentRoom.title}</strong>
-                  <span>
-                    Código: {currentRoom.code} &nbsp;
-                    <CopyToClipboard
-                      style={{ cursor: "pointer" }}
-                      text={currentRoom.code}
-                      onCopy={() => {
-                        toast.success("Código copiado!", { autoClose: 1500 });
-                      }}
-                    >
-                      <MdOutlineContentCopy />
-                    </CopyToClipboard>
-                  </span>
-                </div>
-              </div>
-              <TiArrowBack
-                onClick={() => {
-                  setCurrentRoom(null);
-                }}
-              />
-            </div>
-          )}
-        </div>
-
-        <div>
-          <aside>
-            {loadingRooms ? (
-              <>
-                Carregando salas
-                <BallTriangle
-                  width="50"
-                  color="#112d4e"
-                  ariaLabel="loading-rooms-indicator"
-                />
-              </>
-            ) : (
-              <>
-                {rooms.map((room) => {
-                  return (
-                    <div
-                      key={room.id}
-                      onClick={() => handleSetCurrentRoom(room)}
-                    >
-                      <img src={session.user.image} alt={room.title} />
-                      <div>
-                        <strong>{room.title}</strong>
-                      </div>
-                    </div>
-                  );
-                })}
-              </>
-            )}
-          </aside>
-
-          {currentRoom ? (
-            <main>
-              <div id="messages">
-                {messages.map((msg) => {
-                  return (
-                    <div key={generateId()}>
-                      <span style={{ display: "block" }}>
-                        <strong>
-                          {msg.user.email === session.user.email
-                            ? ""
-                            : msg.user.name + " "}
-                        </strong>
-                        {msg.text}
-                      </span>
-                    </div>
-                  );
-                })}
-                <div ref={messagesEndRef} />
-              </div>
-
-              <form onSubmit={(e) => sendMessage(e, message)}>
-                <input
-                  type="text"
-                  required
-                  placeholder="Mensagem..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                />
-                <button type="submit">Enviar</button>
-              </form>
-            </main>
-          ) : (
-            <div>
-              <h1>Suas mensagens</h1>
-              <button onClick={handleCreateRoom}>Criar nova sala</button>
-              <button onClick={handleEnterInRoom}>Entrar em uma sala</button>
-            </div>
-          )}
-        </div>
-      </div> */}
-    </>
+      </Grid>
+    </Flex>
   );
 }
 

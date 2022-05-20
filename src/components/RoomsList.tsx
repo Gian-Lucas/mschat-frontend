@@ -12,6 +12,8 @@ import {
   Avatar,
   Spinner,
   Box,
+  useBreakpointValue,
+  Heading,
 } from "@chakra-ui/react";
 import { useRef } from "react";
 import { FiMenu } from "react-icons/fi";
@@ -33,8 +35,38 @@ export function RoomsList({
   handleSetCurrentRoom,
   loadingRooms,
 }: RoomsListProps) {
+  const isDesktop = useBreakpointValue({ md: true });
   const { isOpen, onOpen, onClose } = useDisclosure();
   const btnRef = useRef();
+
+  if (isDesktop) {
+    return (
+      <Box>
+        {rooms.length === 0 ? (
+          <Text>Nenhuma sala</Text>
+        ) : (
+          <Heading fontSize="3xl">Salas</Heading>
+        )}
+        {rooms.map((room) => {
+          return (
+            <Flex
+              cursor="pointer"
+              key={room.id}
+              align="center"
+              mt="2"
+              onClick={() => {
+                handleSetCurrentRoom(room);
+                onClose();
+              }}
+            >
+              <Avatar name={room.title} />
+              <Text ml="2">{room.title}</Text>
+            </Flex>
+          );
+        })}
+      </Box>
+    );
+  }
 
   return (
     <>
