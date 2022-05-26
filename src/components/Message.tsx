@@ -37,12 +37,10 @@ export function Message({ msg, email }: MessageProps) {
         borderRadius="lg"
         p="2"
         mt="2"
-        bg={msg.user.email === email ? "blue.900" : "gray.700"}
+        // bg={msg.user.email === email ? "blue.900" : "gray.700"}
       >
         {msg.text}
       </Text>
     </Flex>
   );
 }
-
-

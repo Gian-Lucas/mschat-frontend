@@ -6,7 +6,7 @@ export default function Login() {
   return (
     <Flex justify="center" align="center" flexDir="column" h="90vh">
       <Heading>Fazer login</Heading>
-      <Button onClick={() => signIn("google")} mt="6" bg="gray.700">
+      <Button onClick={() => signIn("google")} mt="6">
         Sign in
       </Button>
     </Flex>

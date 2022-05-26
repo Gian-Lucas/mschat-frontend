@@ -232,40 +232,15 @@ export default function Home() {
         )}
         <Menu>
           <MenuButton
-            _focus={{
-              bg: "gray.700",
-            }}
             autoFocus={false}
-            bg="gray.700"
             as={IconButton}
             aria-label="Menu"
             icon={<MdAdd />}
           />
-          <MenuList bg="gray.700">
-            <MenuItem
-              _focus={{
-                bg: "gray.700",
-              }}
-              onClick={handleCreateRoom}
-            >
-              Criar uma nova sala
-            </MenuItem>
-            <MenuItem
-              _focus={{
-                bg: "gray.700",
-              }}
-              onClick={handleEnterInRoom}
-            >
-              Entrar em uma sala
-            </MenuItem>
-            <MenuItem
-              _focus={{
-                bg: "gray.700",
-              }}
-              onClick={() => signOut()}
-            >
-              Deslogar
-            </MenuItem>
+          <MenuList>
+            <MenuItem onClick={handleCreateRoom}>Criar uma nova sala</MenuItem>
+            <MenuItem onClick={handleEnterInRoom}>Entrar em uma sala</MenuItem>
+            <MenuItem onClick={() => signOut()}>Deslogar</MenuItem>
           </MenuList>
         </Menu>
       </Flex>
@@ -314,14 +289,7 @@ export default function Home() {
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                     />
-                    <Button
-                      fontSize="14"
-                      type="submit"
-                      bg="gray.700"
-                      _hover={{
-                        bg: "gray.700",
-                      }}
-                    >
+                    <Button fontSize="14" type="submit">
                       Enviar
                     </Button>
                   </Flex>
