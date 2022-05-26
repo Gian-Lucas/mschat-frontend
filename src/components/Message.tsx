@@ -1,4 +1,4 @@
-import { Flex, Avatar, Text } from "@chakra-ui/react";
+import { Flex, Avatar, Text, useColorModeValue } from "@chakra-ui/react";
 
 interface MessageType {
   user: {
@@ -15,6 +15,10 @@ interface MessageProps {
 }
 
 export function Message({ msg, email }: MessageProps) {
+  const bg = useColorModeValue(
+    msg.user.email === email ? "gray.300" : "gray.100",
+    msg.user.email === email ? "blue.900" : "gray.700"
+  );
   return (
     <Flex
       mt="4"
@@ -33,12 +37,7 @@ export function Message({ msg, email }: MessageProps) {
         </Text>
       </Flex>
 
-      <Text
-        borderRadius="lg"
-        p="2"
-        mt="2"
-        // bg={msg.user.email === email ? "blue.900" : "gray.700"}
-      >
+      <Text borderRadius="lg" p="2" mt="2" bg={bg}>
         {msg.text}
       </Text>
     </Flex>

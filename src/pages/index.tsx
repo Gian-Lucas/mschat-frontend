@@ -22,6 +22,7 @@ import {
   MenuList,
   Spinner,
   useBreakpointValue,
+  useColorMode,
 } from "@chakra-ui/react";
 import { RoomsList } from "../components/RoomsList";
 import { Messages } from "../components/Messages";
@@ -43,6 +44,7 @@ interface Room {
 
 export default function Home() {
   const isDesktop = useBreakpointValue({ md: true });
+  const { colorMode, toggleColorMode } = useColorMode();
 
   const { data: session, status } = useSession();
   const [socket, setSocket] = useState<Socket>(null);
@@ -217,7 +219,6 @@ export default function Home() {
     handleSetCurrentRoom(roomExists);
     setUserInRoomsAsGuest(true);
   }
-
   return (
     <Flex flexDir="column" p="2" maxW="1080" mx="auto">
       <Flex justify="space-between">
@@ -240,6 +241,9 @@ export default function Home() {
           <MenuList>
             <MenuItem onClick={handleCreateRoom}>Criar uma nova sala</MenuItem>
             <MenuItem onClick={handleEnterInRoom}>Entrar em uma sala</MenuItem>
+            <MenuItem onClick={toggleColorMode}>
+              Tema {colorMode === "light" ? "Escuro" : "Claro"}
+            </MenuItem>
             <MenuItem onClick={() => signOut()}>Deslogar</MenuItem>
           </MenuList>
         </Menu>
