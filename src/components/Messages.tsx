@@ -20,7 +20,7 @@ interface MessagesProps {
 
 function MessagesComponent({ messages, email, messagesEndRef }: MessagesProps) {
   return (
-    <Flex flexDir="column" overflowY="auto" h="100%" mb="2">
+    <Flex flexDir="column" overflowY="auto" h="100%" mb="2" pr="1">
       {messages.map((msg) => {
         return <Message msg={msg} email={email} key={generateId()} />;
       })}

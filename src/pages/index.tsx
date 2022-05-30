@@ -1,10 +1,7 @@
 import { io, Socket } from "socket.io-client";
 import { useEffect, useRef, useState } from "react";
 
-import CopyToClipboard from "react-copy-to-clipboard";
-import { MdAdd, MdOutlineContentCopy } from "react-icons/md";
-
-import { getSession, signOut, useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { GetServerSideProps } from "next";
 import { FormEvent } from "react";
 import { api } from "../services/api";
@@ -14,18 +11,14 @@ import {
   Flex,
   Grid,
   Heading,
-  IconButton,
-  Input,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuList,
   Spinner,
   useBreakpointValue,
-  useColorMode,
 } from "@chakra-ui/react";
 import { RoomsList } from "../components/RoomsList";
 import { Messages } from "../components/Messages";
+import { Menu } from "../components/Menu";
+import { Form } from "../components/Form";
+import { HeaderRoom } from "../components/HeaderRoom";
 
 interface Message {
   user: {
@@ -44,7 +37,6 @@ interface Room {
 
 export default function Home() {
   const isDesktop = useBreakpointValue({ md: true });
-  const { colorMode, toggleColorMode } = useColorMode();
 
   const { data: session, status } = useSession();
   const [socket, setSocket] = useState<Socket>(null);
@@ -127,7 +119,6 @@ export default function Home() {
     e.preventDefault();
 
     if (text === "") {
-      console.log("pode n");
       return;
     }
 
@@ -229,24 +220,14 @@ export default function Home() {
             loadingRooms={loadingRooms}
           />
         ) : (
-          <Heading>MSchat</Heading>
+          <Heading onClick={() => setCurrentRoom(null)} cursor="pointer">
+            MSchat
+          </Heading>
         )}
-        <Menu>
-          <MenuButton
-            autoFocus={false}
-            as={IconButton}
-            aria-label="Menu"
-            icon={<MdAdd />}
-          />
-          <MenuList>
-            <MenuItem onClick={handleCreateRoom}>Criar uma nova sala</MenuItem>
-            <MenuItem onClick={handleEnterInRoom}>Entrar em uma sala</MenuItem>
-            <MenuItem onClick={toggleColorMode}>
-              Tema {colorMode === "light" ? "Escuro" : "Claro"}
-            </MenuItem>
-            <MenuItem onClick={() => signOut()}>Deslogar</MenuItem>
-          </MenuList>
-        </Menu>
+        <Menu
+          handleCreateRoom={handleCreateRoom}
+          handleEnterInRoom={handleEnterInRoom}
+        />
       </Flex>
 
       <Grid mt="5" templateColumns={isDesktop ? "1fr 3fr" : "1fr"}>
@@ -261,21 +242,7 @@ export default function Home() {
         <Flex flex="1" justify="center" align="center">
           {currentRoom ? (
             <Flex flexDir="column" align="center" p="1" w="100%">
-              <Flex align="center" justify="space-between" w="100%">
-                <Heading>{currentRoom.title}</Heading>
-                <Flex align="center" fontSize="16">
-                  {currentRoom.code} &nbsp;
-                  <CopyToClipboard
-                    style={{ cursor: "pointer" }}
-                    text={currentRoom.code}
-                    onCopy={() => {
-                      toast.success("Código copiado!", { autoClose: 1500 });
-                    }}
-                  >
-                    <MdOutlineContentCopy />
-                  </CopyToClipboard>
-                </Flex>
-              </Flex>
+              <HeaderRoom currentRoom={currentRoom} />
 
               <Flex flexDir="column" justify="flex-end" w="100%" h="77vh">
                 <Messages
@@ -284,20 +251,11 @@ export default function Home() {
                   email={session.user.email}
                 />
 
-                <form onSubmit={(e) => sendMessage(e, message)}>
-                  <Flex>
-                    <Input
-                      fontSize="14"
-                      placeholder="Mensagem..."
-                      mr="2"
-                      value={message}
-                      onChange={(e) => setMessage(e.target.value)}
-                    />
-                    <Button fontSize="14" type="submit">
-                      Enviar
-                    </Button>
-                  </Flex>
-                </form>
+                <Form
+                  message={message}
+                  sendMessage={sendMessage}
+                  setMessage={setMessage}
+                />
               </Flex>
             </Flex>
           ) : (
