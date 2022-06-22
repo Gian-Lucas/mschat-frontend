@@ -8,8 +8,8 @@ const config: ThemeConfig = {
 export const theme = extendTheme({
   config,
   fonts: {
-    heading: "Roboto Helvetica",
-    body: "Roboto Helvetica",
+    heading: "Helvetica",
+    body: "Helvetica",
   },
   styles: {
     global: {
